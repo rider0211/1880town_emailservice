@@ -37,10 +37,11 @@ class EmailHandler:
             subject = msg['subject']
             body = self.decode_message(msg)
             response = self.agent.chat_bing(body, email_from)
-            if "special offer" in body.lower():
+            attachment_path = None
+            if "Here is my affirmation card." in response:
                 imgnum = random.randint(1, 3)
                 attachment_path = f"{imgnum}_out.png"
-                change_image_text(imgnum, self.agent.agent_name, "Special Offer for You!", attachment_path)
+                change_image_text(imgnum, self.agent.agent_name, f"Hi, {subject}", attachment_path)
                 self.reply_email(email_from, subject, response, attachment_path)
             else:
                 self.reply_email(email_from, subject, response)
