@@ -1,5 +1,6 @@
 import mysql.connector
 import json
+from mysql.connector import Error
 
 class Database:
     def __init__(self, config):
@@ -7,6 +8,31 @@ class Database:
 
     def get_connection(self):
         return mysql.connector.connect(**self.config)
+
+    def initialize_database(self):
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            # Create table if it does not exist
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS chat_sessions (
+                    email_address VARCHAR(255),
+                    chat_history TEXT NOT NULL,
+                    show_affirmation_card TINYINT,
+                    account_name VARCHAR(255),
+                    PRIMARY KEY (email_address, account_name)
+                );
+            """)
+            # Clear the table on restart
+            cursor.execute("TRUNCATE TABLE chat_sessions;")
+            conn.commit()
+        except Error as e:
+            print(f"Error initializing database: {e}")
+            cursor.execute("TRUNCATE TABLE chat_sessions;")
+            conn.commit()
+        finally:
+            cursor.close()
+            conn.close()
 
     def update_chat_history(self, email_address, account_name, messages, show_affirmation_card):
         conn = self.get_connection()
