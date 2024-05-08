@@ -7,3 +7,4 @@ scenario.txt
 3_out.png
 Ublock guide .pdf
 .env
+__pycache__
