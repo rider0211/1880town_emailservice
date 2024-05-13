@@ -8,8 +8,8 @@ from database import Database
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-OTIS_PASSWORD = os.getenv('OTIS_PASSWORD')
-BING_PASSWORD = os.getenv('BING_PASSWORD')
+OTIS_PASSWORD = "ifck bkvk pjjp sgdm"
+BING_PASSWORD = "nwzy cztc xbbl ormj"
 
 db_config = {'user': 'root', 'password': '', 'host': 'localhost', 'database': 'chatbot', 'raise_on_warnings': True}
 
