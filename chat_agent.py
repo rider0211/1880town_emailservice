@@ -76,6 +76,7 @@ class ChatAgent:
         print(messages)
         self.show_affirmation_card = self.db.fetch_card_status(email_address, 'otis')
         show_affirmation_card = self.db.fetch_card_status(email_address, 'otis')
+        username = self.db.fetch_user_name(email_address, 'otis')
         otis_response = ""
         print(subject)
         if not messages:
@@ -100,12 +101,8 @@ class ChatAgent:
                 otis_response = response.choices[0].message.content.strip()
                 print(1)
             elif "otis" in subject.lower():
-<<<<<<< Updated upstream
-                affirmation_card_agree_prompt = "You've sent your affirmation card just before. Don't ask about the password and your affirmation card anymore."
-=======
                 username = " ".join(subject.split()[1:])
                 affirmation_card_agree_prompt = "Please tell him that you are going to send the affirmation card at 7:00 a.m tomorrow. Don't ask about the password and your affirmation card anymore."
->>>>>>> Stashed changes
                 messages = [{"role": "system", "content": affirmation_card_agree_prompt}]
                 messages.append({"role": "user", "content": user_input})
                 response = openai.chat.completions.create(
@@ -150,5 +147,5 @@ class ChatAgent:
                 print(5)
         messages.append({"role": "assistant", "content": otis_response})
         print("show_affirmation_card: ", show_affirmation_card)
-        self.db.update_chat_history(email_address, 'otis', messages, show_affirmation_card)
+        self.db.update_chat_history(email_address, 'otis', messages, show_affirmation_card, username)
         return otis_response

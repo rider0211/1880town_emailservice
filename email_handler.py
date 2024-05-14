@@ -33,32 +33,22 @@ class EmailHandler:
     def read_emails_bing(self):
         try:
             type, data = self.mail.search(None, 'UNSEEN')
-            # Process emails
         except imaplib.IMAP4.abort as e:
             print(f"IMAP connection aborted: {e}. Reconnecting...")
             self.connect()  # Ensure this method reinitializes self.mail correctly
             type, data = self.mail.search(None, 'UNSEEN')  # Retry the operation
         except Exception as e:
             print(f"An error occurred: {e}")
+
         for num in data[0].split():
             typ, data = self.mail.fetch(num, '(RFC822)')
             msg = message_from_bytes(data[0][1])
             email_from = msg['from']
             subject = msg['subject']
-            in_reply_to = msg['In-Reply-To']
-            body = None
-            if in_reply_to:
-                body = self.decode_message(msg, reply=True)
+            if msg['In-Reply-To'] or msg.get('References'):
+                response = "Hey there, superstars! Instead of hitting the Reply button, can you create a brand new message to chat with me? It's like starting a fresh adventure each time! I like this. Thanks a bunch, and keep being awesome!"
+                self.reply_email(email_from, subject, response)
             else:
-<<<<<<< Updated upstream
-                body = self.decode_message(msg, reply=False)
-            response = self.agent.chat_bing(body, email_from)
-            attachment_path = None
-            if "Here is my affirmation card." in response and self.agent.show_affirmation_card == True:
-                imgnum = random.randint(1, 3)
-                attachment_path = f"{imgnum}_out.png"
-                change_image_text(imgnum, self.agent.agent_name, f"Hi {subject}", attachment_path)
-=======
                 body = self.decode_message(msg)
                 response = self.agent.chat_bing(body, email_from)
                 attachment_path = None
@@ -66,46 +56,31 @@ class EmailHandler:
                     imgnum = random.randint(1, 3)
                     attachment_path = f"{imgnum}_out.png"
                     change_image_text(imgnum, self.agent.agent_name, f"Hi {subject}", attachment_path)
->>>>>>> Stashed changes
                 self.reply_email(email_from, subject, response, attachment_path)
-            else:
-                self.reply_email(email_from, subject, response)
             self.mark_as_read(num)
 
     def read_emails_otis(self):
         try:
             type, data = self.mail.search(None, 'UNSEEN')
-            # Process emails
         except imaplib.IMAP4.abort as e:
             print(f"IMAP connection aborted: {e}. Reconnecting...")
-            self.connect()  # Ensure this method reinitializes self.mail correctly
-            type, data = self.mail.search(None, 'UNSEEN')  # Retry the operation
+            self.connect()
+            type, data = self.mail.search(None, 'UNSEEN')
         except Exception as e:
             print(f"An error occurred: {e}")
+        
         print("Unread emails count:", len(data[0].split()))
-        # print(len(data[0].split()))
+
         for num in data[0].split():
             typ, data = self.mail.fetch(num, '(RFC822)')
             msg = message_from_bytes(data[0][1])
             email_from = msg['from']
             subject = msg['subject']
-            in_reply_to = msg['In-Reply-To']
-            body = None
-            if in_reply_to:
-                body = self.decode_message(msg, reply=True)
+            
+            if msg['In-Reply-To'] or msg.get('References'):
+                response = "Hey there, superstars! Instead of hitting the Reply button, can you create a brand new message to chat with me? It's like starting a fresh adventure each time! I like this. Thanks a bunch, and keep being awesome!"
+                self.reply_email(email_from, subject, response)
             else:
-<<<<<<< Updated upstream
-                body = self.decode_message(msg, reply=False)
-            response = self.agent.chat_otis(subject, body, email_from)
-            attachment_path = None
-            if "otis" in subject and self.agent.show_affirmation_card == True or "Here is my affirmation card." in response:
-                username = " ".join(subject.split()[1:])
-                imgnum = random.randint(1, 3)
-                attachment_path = f"img/useroutput/{username}_out.png"
-                change_image_text(imgnum, self.agent.agent_name, "Hi " + username, attachment_path)
-            self.reply_email(email_from, subject, response, attachment_path)
-            self.mark_as_read(num)
-=======
                 body = self.decode_message(msg)
                 print('subject:', subject)
                 print('body:', body) 
@@ -128,7 +103,6 @@ class EmailHandler:
                 # Send the response email
                 self.reply_email(email_from, subject, response)
             self.mark_as_read(num)  # Mark the email as read
->>>>>>> Stashed changes
 
     def decode_message(self, msg, reply=False):
         if msg.is_multipart():
