@@ -38,7 +38,7 @@ class ChatAgent:
             status = self.analyze_user_response(user_input)
             print("status: ", status)
             if status:
-                affirmation_card_agree_prompt = "You've sent your affirmation card just before. Don't end your message with 'Do you want to see my affirmation card? If so, please send I want your affirmation card message. message with your name subject.' anymore."
+                affirmation_card_agree_prompt = "Please tell him that you are going to send the affirmation card at 7:00 a.m tomorrow. Don't end your message with 'Do you want to see my affirmation card? If so, please send I want your affirmation card message. message with your name subject.' anymore."
                 messages.append({"role": "system", "content": affirmation_card_agree_prompt})
                 messages.append({"role": "user", "content": user_input})
                 response = openai.chat.completions.create(
@@ -46,7 +46,7 @@ class ChatAgent:
                     messages=messages
                 )
                 bing_response = response.choices[0].message.content.strip()
-                bing_response = bing_response + "Here is my affirmation card."
+                bing_response = bing_response
                 show_affirmation_card = False
                 after_affirmation_card_shown_prompt = "It's enough for you to respond all messages. Don't need to ask about the affirmation card again."
                 messages.append({"role": "system", "content": after_affirmation_card_shown_prompt})
@@ -76,6 +76,7 @@ class ChatAgent:
         print(messages)
         self.show_affirmation_card = self.db.fetch_card_status(email_address, 'otis')
         show_affirmation_card = self.db.fetch_card_status(email_address, 'otis')
+        username = self.db.fetch_user_name(email_address, 'otis')
         otis_response = ""
         print(subject)
         if not messages:
@@ -100,14 +101,15 @@ class ChatAgent:
                 otis_response = response.choices[0].message.content.strip()
                 print(1)
             elif "otis" in subject.lower():
-                affirmation_card_agree_prompt = "You've sent your affirmation card just before. Don't ask about the password and your affirmation card anymore."
+                username = " ".join(subject.split()[1:])
+                affirmation_card_agree_prompt = "Please tell him that you are going to send the affirmation card at 7:00 a.m tomorrow. Don't ask about the password and your affirmation card anymore."
                 messages = [{"role": "system", "content": affirmation_card_agree_prompt}]
                 messages.append({"role": "user", "content": user_input})
                 response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=messages
                 )
-                otis_response = response.choices[0].message.content.strip() + "Here is my affirmation card."
+                otis_response = response.choices[0].message.content.strip()
                 show_affirmation_card = False
                 print(2)
             else:
@@ -127,14 +129,14 @@ class ChatAgent:
             messages.append({"role": "system", "content": otis_info})
             messages.append({"role": "user", "content": user_input})
             if self.analyze_user_response(user_input):
-                affirmation_card_agree_prompt = "You've sent your affirmation card just before."
+                affirmation_card_agree_prompt = "Please tell him that you are going to send the affirmation card at 7:00 a.m tomorrow."
                 messages.append({"role": "system", "content": affirmation_card_agree_prompt})
                 messages.append({"role": "user", "content": user_input})
                 response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=messages
                 )
-                otis_response = response.choices[0].message.content.strip() + "Here is my affirmation card."
+                otis_response = response.choices[0].message.content.strip()
                 print(4)
             else:
                 response = openai.chat.completions.create(
@@ -145,5 +147,5 @@ class ChatAgent:
                 print(5)
         messages.append({"role": "assistant", "content": otis_response})
         print("show_affirmation_card: ", show_affirmation_card)
-        self.db.update_chat_history(email_address, 'otis', messages, show_affirmation_card)
+        self.db.update_chat_history(email_address, 'otis', messages, show_affirmation_card, username)
         return otis_response
