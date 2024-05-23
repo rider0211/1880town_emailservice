@@ -56,7 +56,8 @@ class EmailHandler:
                     imgnum = random.randint(1, 3)
                     attachment_path = f"{imgnum}_out.png"
                     change_image_text(imgnum, self.agent.agent_name, f"Hi {subject}", attachment_path)
-                self.reply_email(email_from, subject, response, attachment_path)
+                    self.imgdb.save_scheduled_message(email_from, 'bing', subject, attachment_path)
+                self.reply_email(email_from, subject, response)
             self.mark_as_read(num)
 
     def read_emails_otis(self):

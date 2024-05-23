@@ -4,7 +4,7 @@ from datetime import datetime
 def change_image_text(image_number, animalname, new_text, output_path):
     # Open an image file
     if image_number <= 10:
-        imagename = "Jgurgin-" + str(image_number * 2  - 1).zfill(2)
+        imagename = "Jgurgin-" + str(image_number * 2 - 1).zfill(2)
         with Image.open(f"img/otis/{imagename}.jpg") as img:
             # Ensure the image is in RGBA mode to handle transparency
             if img.mode != 'RGBA':
@@ -22,12 +22,17 @@ def change_image_text(image_number, animalname, new_text, output_path):
             
             # Draw the new text centered
             draw.text(text_position, new_text, font=font, fill='black')
+            
+            # Define footer text and font
             footer = animalname + ' - ' + datetime.now().strftime("%B %d, %Y")
             animalfont = ImageFont.truetype("font/arial.ttf", 30)
-            text_width = draw.textlength(footer, font=font)
-            text_height = 20
-            text_position = (10, img.height - 40)
-            draw.text(text_position, footer, font=animalfont)
+            footer_width = draw.textlength(footer, font=animalfont)
+            footer_height = 20
+            footer_position = ((img.width - footer_width) / 2, img.height - 40)
+            
+            # Draw the footer text centered
+            draw.text(footer_position, footer, font=animalfont, fill='black')
+            
             # Save the modified image
             img.save(output_path, "PNG")
     else:
@@ -49,14 +54,19 @@ def change_image_text(image_number, animalname, new_text, output_path):
             
             # Draw the new text centered
             draw.text(text_position, new_text, font=font, fill='black')
+            
+            # Define footer text and font
             footer = animalname + ' - ' + datetime.now().strftime("%B %d, %Y")
             animalfont = ImageFont.truetype("font/arial.ttf", 30)
-            text_width = draw.textlength(footer, font=font)
-            text_height = 20
-            text_position = (10, img.height - 40)
-            draw.text(text_position, footer, font=animalfont, fill='black')
+            footer_width = draw.textlength(footer, font=animalfont)
+            footer_height = 20
+            footer_position = ((img.width - footer_width) / 2, img.height - 40)
+            
+            # Draw the footer text centered
+            draw.text(footer_position, footer, font=animalfont, fill='black')
+            
             # Save the modified image
             img.save(output_path, "PNG")
 
 # Example usage
-change_image_text(12, "otis", "Hi Alice", f"{2}_out.png")
+# change_image_text(12, "otis", "Hi Alice", f"12_out.png")

@@ -47,8 +47,6 @@ scheduler.add_job(send_scheduled_emails, 'cron', hour=7, minute=0)
 scheduler.start()
 
 try:
-    # This will keep the main thread alive to keep the scheduler running,
-    # alternatively you can use other long-running tasks or services depending on your application's requirement.
     while True:
         time.sleep(2)
 except (KeyboardInterrupt, SystemExit):
