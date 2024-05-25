@@ -27,8 +27,13 @@ class EmailHandler:
         self.mail.select('inbox')
 
     def reconnect(self):
-        self.close_connection()  # Close the existing connection if any
-        self.connect()           # Re-establish a new connection
+        try:
+            print("Reconnecting...")
+            self.close_connection()
+            self.connect()
+            print("Reconnected successfully.")
+        except Exception as e:
+            print(f"Error during reconnection: {e}")
 
     def read_emails_bing(self):
         try:
@@ -94,15 +99,15 @@ class EmailHandler:
                     imgnum = random.randint(1, 20)
                     attachment_path = f"img/useroutput/{username}_out.png"
                     change_image_text(imgnum, self.agent.agent_name, "Hi " + username, attachment_path)
-                    self.imgdb.save_scheduled_message(email_from, 'otis', username, attachment_path)
-                elif "7:00" in response:
+                    # self.imgdb.save_scheduled_message(email_from, 'otis', username, attachment_path)
+                elif "Here is my affirmation card for you." in response:
                     username = self.agent.db.fetch_user_name(email_from, 'otis')
                     imgnum = random.randint(1, 20)
                     attachment_path = f"img/useroutput/{username}_out.png"
                     change_image_text(imgnum, self.agent.agent_name, "Hi " + username, attachment_path)
-                    self.imgdb.save_scheduled_message(email_from, 'otis', username, attachment_path)
+                    # self.imgdb.save_scheduled_message(email_from, 'otis', username, attachment_path)
                 # Send the response email
-                self.reply_email(email_from, subject, response)
+                self.reply_email(email_from, subject, response, attachment_path)
             self.mark_as_read(num)  # Mark the email as read
 
     def decode_message(self, msg, reply=False):
@@ -157,7 +162,19 @@ class EmailHandler:
         self.mail.store(num, '+FLAGS', '\\Seen')
 
     def close_connection(self):
-        self.mail.logout()
+        if self.mail:
+            try:
+                print("Attempting to log out...")
+                self.mail.logout()
+                print("Logged out successfully.")
+            except imaplib.IMAP4.abort as e:
+                print(f"IMAP4 abort error logging out: {e}")
+            except imaplib.IMAP4.error as e:
+                print(f"IMAP4 error logging out: {e}")
+            except Exception as e:
+                print(f"Unexpected error logging out: {e}")
+            finally:
+                self.mail = None
 
     def send_email_with_image(self, recipient, subject, body, image_path):
         msg = MIMEMultipart()

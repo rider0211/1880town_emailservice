@@ -102,14 +102,14 @@ class ChatAgent:
                 print(1)
             elif "otis" in subject.lower():
                 username = " ".join(subject.split()[1:])
-                affirmation_card_agree_prompt = "Please tell him that you are going to send the affirmation card at 7:00 a.m tomorrow. Don't ask about the password and your affirmation card anymore."
+                affirmation_card_agree_prompt = "Imagine that you've just sent the affirmation card. Don't ask about the password and your affirmation card anymore."
                 messages = [{"role": "system", "content": affirmation_card_agree_prompt}]
                 messages.append({"role": "user", "content": user_input})
                 response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=messages
                 )
-                otis_response = response.choices[0].message.content.strip()
+                otis_response = response.choices[0].message.content.strip() + "Here is my affirmation card for you."
                 show_affirmation_card = False
                 print(2)
             else:
